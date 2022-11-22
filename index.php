@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- Bu yazılım Dr. Zafer Akçalı tarafından oluşturulmuştur -->
 <!-- Programmed by Zafer Akçalı, MD-->
-<!-- wos2q-converter V3.0 / 1 November 2022-->
+<!-- wos2q-converter V3.1 / 22 November 2022, added issn and eissn to output-->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -40,7 +40,7 @@ $csv    = array();
 foreach($rows as $row) {
         $csv[] = array_combine($header, explode ("\t", $row));
     }
-$returnValue="Q/index\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."RID\t"."OID";
+$returnValue="Q/index\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."RID\t"."OID";
 if ($wos2Authors)
 	$returnValue=$returnValue."\t"."Addresses\t"."Correspondence\t";
 $returnValue=$returnValue."\n";
@@ -61,6 +61,8 @@ for ($i=0; $i < count ($csv); $i++)	{
 		$queryYear = $eaYear; 
 	}
 	$journal = $csv[$i]['SO'];
+	$issn= $csv[$i]['SN'];
+	$eissn= $csv[$i]['EI'];
 	$RID = $csv[$i]['RI'];
 	$OID = $csv[$i]['OI'];
 	$refStyle = $csv[$i]['JI']." "; //Journal's short name
@@ -176,7 +178,7 @@ else if ($displayIf=='esciExclude' && $ESCI !== 'ESCI')
 		$printLine=TRUE;
 if ($printLine) {
 	$nofPublications++;
-	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$title."\t".$doi."\t".$Volume."\t".$Issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$RID."\t".$OID;
+	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$issn."\t".$eissn."\t".$title."\t".$doi."\t".$Volume."\t".$Issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$RID."\t".$OID;
 if ($wos2Authors)
 	$returnValue=$returnValue."\t".$addresses."\t".$correspondence;
 $returnValue=$returnValue."\n";	
