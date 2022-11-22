@@ -1,5 +1,5 @@
 # wos2q
-convert web of science output to publication list, including Quartile values
+converts tab delimited, full web of science output to publication list, including Quartile values
 
 To be complete and clear, you need a complete set of journals quartile values, from year 1997-to date (2021), including journal name, issn, eissn, and quartile values. An example set included in asset folder. You need to add this journals to a SQLite empty database.
 
