@@ -5,4 +5,8 @@ To be complete and clear, you need a complete set of journals quartile values, f
 
 The files in the asset is not needed to software to be run, they are just needed to produce a complete set of quartile list.
 
-Program calculates Quartile values, according to, if possible "Publication Year". If journal is only in electronic format, then calculates quartile value according to "Early Access" year. You can change that behavior by ticking "Prefer ea.Year for computing Q" in the menu. InCites, calculates Quartile values according to Early Access Year.
+Program calculates Quartile values, according to, if possible "Publication Year". If journal is only in electronic format, then calculates quartile value according to "Early Access" year. You can change that behavior by ticking "Prefer ea.Year for computing Q" checkbox from the menu. InCites, calculates Quartile values according to Early Access Year.
+
+There are two types of outputs:
+1- Doesn't include author-address fields. This is the default output
+2- If user ticks "Include addresses" checkbox from the menu, software Reads C1 and RP fields from Web of Science output and writes Addresses and Correspondence fields to the end of output.  Another utility, q2authors reads that file, and tries to split authors of a specific institution.
