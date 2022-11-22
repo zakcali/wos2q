@@ -12,3 +12,5 @@ There are two types of outputs:
 1- Doesn't include author-address fields. This is the default output
 
 2- If user ticks "Include addresses" checkbox from the menu, software Reads C1 and RP fields from Web of Science output and writes Addresses and Correspondence fields to the end of output.  Another utility, q2authors reads that file, and tries to split authors of a specific institution.
+
+There are .htaccess files for Apache server, because the asset is copyrighted by Clarivate analytics. You must prevent access from outside of the campus, and you must also restrict the database file to be downloaded.
