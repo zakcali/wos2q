@@ -7,7 +7,7 @@ The files in the asset is not needed to software to be run, they are just needed
 
 Program calculates Quartile values, according to, if possible "Publication Year". If journal is only in electronic format, then calculates quartile value according to "Early Access" year. You can change that behavior by ticking "Prefer ea.Year for computing Q" checkbox from the menu. InCites, calculates Quartile values according to Early Access Year.
 
-if Year of the publication is ahead of last quartile list ( for example, 2022 quartile values are not known in 2021) then method is "quess" quartile. if it finds the quartile in database, then Method is "final"
+if Year of the publication is ahead of last known quartile list ( for example, 2022 quartile values are not known in 2021) then method is "quess" quartile. if it finds the quartile in database, then Method is "final"
 There are two types of outputs:
 
 1- Doesn't include author-address fields. This is the default output
