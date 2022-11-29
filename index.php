@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- Bu yazılım Dr. Zafer Akçalı tarafından oluşturulmuştur -->
 <!-- Programmed by Zafer Akçalı, MD-->
-<!-- wos2q-converter V3.1 / 22 November 2022, added issn and eissn to output-->
+<!-- wos2q-converter V3.2 / 29 November 2022, mini-mod for citing articles-->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -18,7 +18,7 @@ $noQuartile="n/a";
 $quartileSource = "2021";
 $quartileTolerance = "2022";
 $queryYear="";
-$calculateForEA=$wos2Authors=FALSE;
+$calculateForEA=$wos2Authors=$miniMod=FALSE;
 if (isset($_POST['publications'])) {
 	$csvText = $_POST['publications']; 
 	if($csvText!=""){
@@ -26,7 +26,8 @@ if (isset($_POST['calcForEA']))
 	$calculateForEA=TRUE;
 if (isset($_POST['wos2Authors'])) 
 	$wos2Authors=TRUE;
-	
+if (isset($_POST['miniMod'])) 
+	$miniMod=TRUE;
 $displayIf = $_POST['displayIf']; 
 $db = new SQLite3("xyz-hidden-folder-abc/xyz-hidden-database-abc.db");
 // convert csv file to 2 dimentional associative array , 2 steps
@@ -40,7 +41,10 @@ $csv    = array();
 foreach($rows as $row) {
         $csv[] = array_combine($header, explode ("\t", $row));
     }
-$returnValue="Q/index\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."RID\t"."OID";
+if ($miniMod)
+	$returnValue="Q/index\t"."Method\t"."Wos number\t"."Doc type\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn";
+else
+	$returnValue="Q/index\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."RID\t"."OID";
 if ($wos2Authors)
 	$returnValue=$returnValue."\t"."Addresses\t"."Correspondence\t";
 $returnValue=$returnValue."\n";
@@ -81,8 +85,10 @@ for ($i=0; $i < count ($csv); $i++)	{
 		if ($articleNr)
 			$refStyle=$refStyle.$articleNr.".";
 	}
+if (!$miniMod) { // it takes time, skip if not necessary
 	$authors=$csv[$i]['AU'];
 	$authorCount=substr_count($authors,";")+1;
+}
 	if ($wos2Authors) {
 	$addresses=$csv[$i]['C1'];
 	$correspondence=$csv[$i]['RP'];
@@ -176,7 +182,11 @@ else if ($displayIf=='esciOnly' && $ESCI == 'ESCI')
 		$printLine=TRUE;
 else if ($displayIf=='esciExclude' && $ESCI !== 'ESCI')
 		$printLine=TRUE;
-if ($printLine) {
+if ($miniMod) {
+		$nofPublications++;
+		$returnValue=$returnValue.$quartile."\t".$method."\t".$wosNumber."\t".$docType."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$issn."\t".$eissn."\n";
+}
+else if ($printLine) {
 	$nofPublications++;
 	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$issn."\t".$eissn."\t".$title."\t".$doi."\t".$Volume."\t".$Issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$RID."\t".$OID;
 if ($wos2Authors)
@@ -197,6 +207,7 @@ $returnValue=$returnValue."\n";
 <!----------------------------------- for php ---------------------------------------->
 <form method="post" action=""> 
 <textarea rows = "45" cols = "170" name = "publications" wrap="off" id="publicationsArea"><?php echo $returnValue;?></textarea>  <br/> <input type="submit" id="gonder" disabled="true" >
+&emsp;Mini-Mod<input type="checkbox" name="miniMod">
 &emsp;Prefer ea.Year for computing Q<input type="checkbox" name="calcForEA">
 &emsp;Include addresses <input type="checkbox" name="wos2Authors">
 &emsp;Display all<input type="radio" name="displayIf" value="displayAll" checked="checked">
