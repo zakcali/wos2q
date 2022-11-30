@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- Bu yazılım Dr. Zafer Akçalı tarafından oluşturulmuştur -->
 <!-- Programmed by Zafer Akçalı, MD-->
-<!-- wos2q-converter V3.2 / 29 November 2022, mini-mod for citing articles-->
+<!-- wos2q-converter V3.3 / 30 November 2022, mini-mod for citing articles-->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -266,7 +266,7 @@ document.getElementById('WOSnumber').value = "";
 }
 function queryWOSnumber() {
 CSV = document.getElementById('publicationsArea').value;
-strippedCSV = CSV.replace (/(WOS:\d\d\d\d\d\d\d\d\d\d\d\d\d\d\d)|[^]/g,'$1'); // delete all except wos numbers
+strippedCSV = CSV.replace (/(WOS:\w\w\w\w\w\w\w\w\w\w\w\w\w\w\w)|[^]/g,'$1'); // delete all except wos numbers
 strippedCSV=strippedCSV.replace(/WOS:/g, ' OR WOS:'); // put OR before all WOS:
 strippedCSV= 'UT=('+strippedCSV.slice(4) + ')'; // create wos advanced query string
 document.getElementById('publicationsArea').value=strippedCSV;
