@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- Bu yazılım Dr. Zafer Akçalı tarafından oluşturulmuştur -->
 <!-- Programmed by Zafer Akçalı, MD-->
-<!-- wos2q-converter V3.3 / 30 November 2022, mini-mod for citing articles-->
+<!-- wos2q-converter V3.9 / 7 December 2022, added $ISTP,$ISSHP,$BSCI,$BHCI, isbn, journ,abstr, docType Full, optional Fullname, Group authors, Book-->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -18,7 +18,7 @@ $noQuartile="n/a";
 $quartileSource = "2021";
 $quartileTolerance = "2022";
 $queryYear="";
-$calculateForEA=$wos2Authors=$miniMod=FALSE;
+$calculateForEA=$wos2Authors=$miniMod=$fullName=FALSE;
 if (isset($_POST['publications'])) {
 	$csvText = $_POST['publications']; 
 	if($csvText!=""){
@@ -28,6 +28,9 @@ if (isset($_POST['wos2Authors']))
 	$wos2Authors=TRUE;
 if (isset($_POST['miniMod'])) 
 	$miniMod=TRUE;
+if (isset($_POST['fullName'])) 
+	$fullName=TRUE;
+	
 $displayIf = $_POST['displayIf']; 
 $db = new SQLite3("xyz-hidden-folder-abc/xyz-hidden-database-abc.db");
 // convert csv file to 2 dimentional associative array , 2 steps
@@ -42,16 +45,17 @@ foreach($rows as $row) {
         $csv[] = array_combine($header, explode ("\t", $row));
     }
 if ($miniMod)
-	$returnValue="Q/index\t"."Method\t"."Wos number\t"."Doc type\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn";
+	$returnValue="Q\t"."Method\t"."Wos number\t"."Doc type\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn";
 else
-	$returnValue="Q/index\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."RID\t"."OID";
+	$returnValue="Q\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."istp\t"."isshp\t"."bsci\t"."bhci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."Journ\t"."Book\t"."issn\t"."eissn\t"."isbn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."gAuthors\t"."Abstr\t"."RID\t"."OID";
 if ($wos2Authors)
 	$returnValue=$returnValue."\t"."Addresses\t"."Correspondence\t";
 $returnValue=$returnValue."\n";
 for ($i=0; $i < count ($csv); $i++)	{
 	$printLine=FALSE;
-	$refStyle="";
-	$title=  $csv[$i]['TI'];
+	$gAuthors=$csv[$i]['CA']; // group of authors
+	$abstr=$csv[$i]['AB']; // abstract
+	$title= $csv[$i]['TI'];
 	$pYear=$csv[$i]['PY'];
 	$eaDate=$csv[$i]['EA'];
 	if ($eaDate) 
@@ -64,31 +68,37 @@ for ($i=0; $i < count ($csv); $i++)	{
 	if ($calculateForEA && $eaDate ) { // user wants to calculate quartile according to early access year
 		$queryYear = $eaYear; 
 	}
-	$journal = $csv[$i]['SO'];
+	$journal = $csv[$i]['SO']; 
+	$journ = $csv[$i]['JI']; //Journal's short name
+	$book = $csv[$i]['SE'];  // Book's name
 	$issn= $csv[$i]['SN'];
 	$eissn= $csv[$i]['EI'];
+	$isbn = $csv[$i]['BN']; // isbn for books
 	$RID = $csv[$i]['RI'];
 	$OID = $csv[$i]['OI'];
-	$refStyle = $csv[$i]['JI']." "; //Journal's short name
-	$Volume=$csv[$i]['VL'];
-	$Issue=$csv[$i]['IS'];
+	$refStyle = $journ." "; //Journal's short name .......
+	$volume=$csv[$i]['VL'];
+	$issue=$csv[$i]['IS'];
 	$pageBegin=$csv[$i]['BP'];
 	$pageEnd=$csv[$i]['EP'];
 	$articleNr=$csv[$i]['AR'];
 	if ($pYear) { // AMA 11th referencing style https://libguides.jcu.edu.au/ama/journal-article
-		$refStyle=$refStyle.$pYear.";".$Volume;
-		if ($Issue)
-			$refStyle=$refStyle."(".$Issue.")";
+		$refStyle=$refStyle.$pYear.";".$volume;
+		if ($issue)
+			$refStyle=$refStyle."(".$issue.")";
 		$refStyle=$refStyle.":";
 		if ($pageBegin) 
 			$refStyle=$refStyle.$pageBegin."-".$pageEnd.".";
 		if ($articleNr)
 			$refStyle=$refStyle.$articleNr.".";
 	}
-if (!$miniMod) { // it takes time, skip if not necessary
-	$authors=$csv[$i]['AU'];
-	$authorCount=substr_count($authors,";")+1;
-}
+	
+	if (!$miniMod) { // it takes time, skip if not necessary
+		if ($fullName)
+			$authors=$csv[$i]['AF']; // For arciving full names
+		else $authors=$csv[$i]['AU'];
+		$authorCount=substr_count($authors,";")+1;
+	}
 	if ($wos2Authors) {
 	$addresses=$csv[$i]['C1'];
 	$correspondence=$csv[$i]['RP'];
@@ -103,7 +113,7 @@ if (!$miniMod) { // it takes time, skip if not necessary
 	$PMIDLink="https://pubmed.ncbi.nlm.nih.gov/".$PMID;	
 	$citation = $csv[$i]['TC'];
 	$wosIndex = $csv[$i]['WE'];
-	$SCIE=$SSCI=$AHCI=$ESCI=""; // assign default values once
+	$SCIE=$SSCI=$AHCI=$ESCI=$ISTP=$ISSHP=$BSCI=$BHCI=""; // assign default values once
 	if (strpos($wosIndex, 'SCI-EXPANDED') !== false) 
 			$SCIE = "SCIE";
 	if (strpos($wosIndex, '(SSCI)') !== false) 
@@ -112,25 +122,23 @@ if (!$miniMod) { // it takes time, skip if not necessary
 			$AHCI = "AHCI";
 	if (strpos($wosIndex, 'ESCI') !== false) 
 			$ESCI = "ESCI";
+	if (strpos($wosIndex, 'CPCI-S)') !== false) 
+			$ISTP = "ISTP";
+	if (strpos($wosIndex, 'CPCI-SSH)') !== false) 
+			$ISSHP = "ISSHP";	
+	if (strpos($wosIndex, 'BKCI-S)') !== false) 
+			$BSCI = "BSCI";
+	if (strpos($wosIndex, 'BKCI-SSH)') !== false) 
+			$BHCI = "BHCI";
 	$docType = $csv[$i]['DT'];
-	$docType = str_replace("; Early Access", "", $docType);
-	$docType = str_replace("Editorial Material", "Editor.", $docType);
-	$docType = str_replace("Meeting Abstract", "Mtg.Ab.", $docType);
-	$docType = str_replace("Article; Proceedings Paper", "Artc.PP", $docType);
-	$docType = str_replace("Article; Book Chapter", "Artc.BC", $docType);
-	$docType = str_replace("Correction", "Corrt.", $docType);
-	$docType = str_replace("Retraction", "Retr.", $docType);
-	$docType = str_replace("Biographical-Item", "Biog.", $docType);	
-	$docType = str_replace("Proceedings Paper", "Procd.", $docType);	
-	$docType = str_replace("Book Review", "Bk.Rev.", $docType);		
 	if ($qissn== null) $qissn = "?";
 	if ($qeissn== null) $qeissn = "?";
 	if ($queryYear == $quartileTolerance) { // current year's quartile is not exists, tolerate it 
 		$queryYear = $quartileSource ;
-		$method = "quess";
+		$method = "tahmin";
 	}
 	else {
-	$method = "final";
+	$method = "kesin";
 	}
 // WOS:000699757300005 exported by wos in which issn and eissn reversed, maybe there are much more reversed issn/eissn
 	$stmt = $db->prepare('select * from quartile where year= :year and (issn= :issn OR issn= :eissn OR eissn= :issn OR eissn= :eissn)');
@@ -138,24 +146,18 @@ if (!$miniMod) { // it takes time, skip if not necessary
 	$stmt->bindValue(':issn',$qissn,SQLITE3_TEXT);
 	$stmt->bindValue(':eissn',$qeissn,SQLITE3_TEXT);
     $result = $stmt->execute();
-	if (!$result->fetchArray()) { // query returned no quartile result
+	if (!$result->fetchArray()) // query returned no quartile result
 		$quartile = "Q?";
-		if (strpos($wosIndex, '(BKCI-SSH)') !== false) 
-			$quartile = "BKSS";
-		else if (strpos($wosIndex, '(BKCI-S)') !== false) 
-			$quartile = "BKS";
-		else if (strpos($wosIndex, 'CPCI-S') !== false) 
-			$quartile = "CPCI";
-	}
 	else	{ // query result is: Q1, Q2, Q3, Q4 or n/a
-	$result->reset(); 
-	while ($roww = $result->fetchArray()) {
-	$quartile = $roww["quartile"];
-		if ($quartile !== $noQuartile) { 
-		break; // if it's n/a try to fetch next match to find Q1, Q2, Q3, or Q4
+		$result->reset(); 
+		while ($roww = $result->fetchArray()) {
+			$quartile = $roww["quartile"];
+				if ($quartile !== $noQuartile) { 
+					break; // if it's n/a try to fetch next match to find Q1, Q2, Q3, or Q4
 				}
 			}
 		}
+
 if ($quartile == 'Q?' && $ESCI !== 'ESCI' && (int)$queryYear > 1996 && $qissn !=='0964-198X' ) { // find a journal, different issn / same name except  'issn=0964-198X'
 	$stmt = $db->prepare('select * from quartile where year= :year and name= :journalname');
 	$stmt->bindValue(':year',(int)$queryYear,SQLITE3_INTEGER);
@@ -188,7 +190,7 @@ if ($miniMod) {
 }
 else if ($printLine) {
 	$nofPublications++;
-	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$issn."\t".$eissn."\t".$title."\t".$doi."\t".$Volume."\t".$Issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$RID."\t".$OID;
+	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$ISTP ."\t".$ISSHP."\t".$BSCI ."\t".$BHCI ."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$journ."\t".$book."\t".$issn."\t".$eissn."\t".$isbn."\t".$title."\t".$doi."\t".$volume."\t".$issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$gAuthors."\t".$abstr."\t".$RID."\t".$OID;
 if ($wos2Authors)
 	$returnValue=$returnValue."\t".$addresses."\t".$correspondence;
 $returnValue=$returnValue."\n";	
@@ -208,17 +210,18 @@ $returnValue=$returnValue."\n";
 <form method="post" action=""> 
 <textarea rows = "45" cols = "170" name = "publications" wrap="off" id="publicationsArea"><?php echo $returnValue;?></textarea>  <br/> <input type="submit" id="gonder" disabled="true" >
 &emsp;Mini-Mod<input type="checkbox" name="miniMod">
-&emsp;Prefer ea.Year for computing Q<input type="checkbox" name="calcForEA">
+&emsp;Full name<input type="checkbox" name="fullName" checked>
+&emsp;Prefer ea.Year for Q<input type="checkbox" name="calcForEA">
 &emsp;Include addresses <input type="checkbox" name="wos2Authors">
 &emsp;Display all<input type="radio" name="displayIf" value="displayAll" checked="checked">
-&emsp;Q1,2,3 articles only<input type="radio" name="displayIf" value="q123Articles">
-&emsp;SSCI or AHCI only<input type="radio" name="displayIf" value="ssahciOnly">
-&emsp;ESCI only<input type="radio" name="displayIf" value="esciOnly">
-&emsp;ESCI exclude<input type="radio" name="displayIf" value="esciExclude"><br/>
+Q1,2,3 articles only<input type="radio" name="displayIf" value="q123Articles">
+SSCI or AHCI only<input type="radio" name="displayIf" value="ssahciOnly">
+ESCI only<input type="radio" name="displayIf" value="esciOnly">
+ESCI exclude<input type="radio" name="displayIf" value="esciExclude"><br/>
 </form>  <!------------------------------------ for php --------------------------------->
-  <span style="color: red">Editor.=</span>Editorial Material 
-  <span style="color: red">Mtg.Ab.=</span> Meeting Abstract   <span style="color: red"> Artc.PP=</span>Article; Proceedings Paper <span style="color: red"> Artc.BC=</span>Article; Book Chapter <span style="color: red">Corrt.=</span>Correction <span style="color: red">Retr.=</span>Retraction <span style="color: red">Biog.=</span>Biographical-Item <br/> <span style="color: red">Procd.=</span>Proceedings Paper <span style="color: red">Bk.Rev.=</span>Book Review <span style="color: red">BKSS=</span>BKCI-SSH <span style="color: red">BKS=</span>BKCI-S <span style="color: red">CPCI=</span>CPCI-S <span style="color: red">p.Year=</span>Publication year <span style="color: red">ea.Year=</span>Early access year <span style="color: red">Auth.#=</span>Number of authors<br/>
-  If publication year is empty, then quartile is calculated according to early access year.   The Emerging Sources Citation Index (ESCI) was launched in late 2015. <br/>
+<span style="color: red">p.Year=</span>Publication year <span style="color: red">ea.Year=</span>Early access year <span style="color: red">Auth.#=</span>Number of authors. Calculates Q values according to <span style="color: red">p.Year </span><br/>
+If publication year is empty, then quartile is calculated according to early access year.   The Emerging Sources Citation Index (ESCI) was launched in late 2015. <br/>
+<span style="color: red">check </span>Include addresses, <span style="color: red">un-check </span>Full name for using q2authors  <br/>
 WOS# <input type="text" name="WOSnumber" size="19" maxlength="19" id="WOSnumber" onkeydown="checkWOS(this)"/> 
 <button id="gotoWOS" onclick="displayWOSdocument()">Show publication</button>
 <button id="gotoCitation" onclick="displayWOScitation()">Show citations</button>
