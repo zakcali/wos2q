@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <!-- Bu yazılım Dr. Zafer Akçalı tarafından oluşturulmuştur -->
 <!-- Programmed by Zafer Akçalı, MD-->
-<!-- wos2q-converter V4.1 / 19 December 2022, added publisher, puplication type, publication doi,
-//BF: Book author full name(s), BE: Book editor(s)-->
+<!-- wos2q-converter V4.2 / 4 Jan 2023, added publisher, meeting abstract number-->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -33,7 +32,7 @@ if (isset($_POST['fullName']))
 	$fullName=TRUE;
 	
 $displayIf = $_POST['displayIf']; 
-$db = new SQLite3("xyz-hidden-folder-abc/xyz-hidden-database-abc.db");
+$db = new SQLite3("763dd801-8114-4904-a62d-5189523fe5f1/75d291a2-9a6c-4dbe-bcf1-8c0667e71710.db");
 // convert csv file to 2 dimentional associative array , 2 steps
 // Step 1: remove empty lines from csv text, then split lines as array
 $tmp = preg_replace('/\s*($|\n)/', '\1', $csvText);
@@ -48,7 +47,7 @@ foreach($rows as $row) {
 if ($miniMod)
 	$returnValue="Q\t"."Method\t"."Wos number\t"."Doc type\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn";
 else
-	$returnValue="Q\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."istp\t"."isshp\t"."bsci\t"."bhci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."Journ\t"."Book\t"."issn\t"."eissn\t"."isbn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."Pub type\t"."Publisher\t"."Book doi\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."gAuthors\t"."Book auth\t"."Book ed\t"."Abstr\t"."RID\t"."OID";
+	$returnValue="Q\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."istp\t"."isshp\t"."bsci\t"."bhci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."Journ\t"."Book\t"."issn\t"."eissn\t"."isbn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."Pub type\t"."Publisher\t"."Book doi\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."gAuthors\t"."Book auth\t"."Book ed\t"."Abstr\t"."M.Abstr\t"."RID\t"."OID";
 if ($wos2Authors)
 	$returnValue=$returnValue."\t"."Addresses\t"."Correspondence\t";
 $returnValue=$returnValue."\n";
@@ -98,7 +97,7 @@ for ($i=0; $i < count ($csv); $i++)	{
 	
 	if (!$miniMod) { // it takes time, skip if not necessary
 		if ($fullName)
-			$authors=$csv[$i]['AF']; // For arciving full names
+			$authors=$csv[$i]['AF']; // For archiving full names, document pool
 		else $authors=$csv[$i]['AU'];
 		$authorCount=substr_count($authors,";")+1;
 	}
@@ -137,6 +136,7 @@ for ($i=0; $i < count ($csv); $i++)	{
 	$pubType = $csv[$i]['PT'];
 	$publisher = $csv[$i]['PU'];
 	$bookDoi = $csv[$i]['D2'];
+	$mAbstract = $csv[$i]['MA'];
 	
 	if ($qissn== null) $qissn = "?";
 	if ($qeissn== null) $qeissn = "?";
@@ -197,7 +197,7 @@ if ($miniMod) {
 }
 else if ($printLine) {
 	$nofPublications++;
-	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$ISTP ."\t".$ISSHP."\t".$BSCI ."\t".$BHCI ."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$journ."\t".$book."\t".$issn."\t".$eissn."\t".$isbn."\t".$title."\t".$doi."\t".$volume."\t".$issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$pubType."\t".$publisher."\t".$bookDoi."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$gAuthors."\t".$bookAuth."\t".$bookEd."\t".$abstr."\t".$RID."\t".$OID;
+	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$ISTP ."\t".$ISSHP."\t".$BSCI ."\t".$BHCI ."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$journ."\t".$book."\t".$issn."\t".$eissn."\t".$isbn."\t".$title."\t".$doi."\t".$volume."\t".$issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$pubType."\t".$publisher."\t".$bookDoi."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$gAuthors."\t".$bookAuth."\t".$bookEd."\t".$abstr."\t".$mAbstract."\t".$RID."\t".$OID;
 if ($wos2Authors)
 	$returnValue=$returnValue."\t".$addresses."\t".$correspondence;
 $returnValue=$returnValue."\n";	
@@ -217,9 +217,9 @@ $returnValue=$returnValue."\n";
 <form method="post" action=""> 
 <textarea rows = "45" cols = "170" name = "publications" wrap="off" id="publicationsArea"><?php echo $returnValue;?></textarea>  <br/> <input type="submit" id="gonder" disabled="true" >
 &emsp;Mini-Mod<input type="checkbox" name="miniMod">
-&emsp;Full name<input type="checkbox" name="fullName" >
+&emsp;Full name<input type="checkbox" name="fullName" checked>
 &emsp;Prefer ea.Year for Q<input type="checkbox" name="calcForEA">
-&emsp;Include addresses <input type="checkbox" name="wos2Authors" checked>
+&emsp;Include addresses <input type="checkbox" name="wos2Authors" >
 &emsp;Display all<input type="radio" name="displayIf" value="displayAll" checked="checked">
 Q1,2,3 articles only<input type="radio" name="displayIf" value="q123Articles">
 SSCI or AHCI only<input type="radio" name="displayIf" value="ssahciOnly">
