@@ -32,7 +32,7 @@ if (isset($_POST['fullName']))
 	$fullName=TRUE;
 	
 $displayIf = $_POST['displayIf']; 
-$db = new SQLite3("wos-database-name.db");
+$db = new SQLite3("xyz-hidden-database-abc.db");
 // convert csv file to 2 dimentional associative array , 2 steps
 // Step 1: remove empty lines from csv text, then split lines as array
 $tmp = preg_replace('/\s*($|\n)/', '\1', $csvText);
