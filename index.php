@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- Bu yazılım Dr. Zafer Akçalı tarafından oluşturulmuştur -->
 <!-- Programmed by Zafer Akçalı, MD-->
-<!-- wos2q-converter V4.4 / 14 Feb 2023, fixes corrupted/misquoted 2 strings when saving-->
+<!-- wos2q-converter V4.6 / 11 Aug 2023, fixes corrupted/misquoted 2 strings when saving, 2022 quartiles, added month-->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -11,12 +11,12 @@
 </head>
 <body>
 <?php 
-set_time_limit(90);
+set_time_limit(120);
 $returnValue="";
 $nofPublications=$authorCount=0;
 $noQuartile="n/a";
-$quartileSource = "2021";
-$quartileTolerance = "2022";
+$quartileSource = "2022";
+$quartileTolerance = "2023";
 $queryYear="";
 $calculateForEA=$wos2Authors=$miniMod=$fullName=FALSE;
 if (isset($_POST['publications'])) {
@@ -47,7 +47,7 @@ foreach($rows as $row) {
 if ($miniMod)
 	$returnValue="Q\t"."Method\t"."Wos number\t"."Doc type\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."issn\t"."eissn";
 else
-	$returnValue="Q\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."istp\t"."isshp\t"."bsci\t"."bhci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Journal\t"."Journ\t"."Book\t"."issn\t"."eissn\t"."isbn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."Pub type\t"."Publisher\t"."Book doi\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."gAuthors\t"."Book auth\t"."Book ed\t"."Abstr\t"."M.Abstr\t"."RID\t"."OID";
+	$returnValue="Q\t"."scie\t"."ssci\t"."ahci\t"."esci\t"."istp\t"."isshp\t"."bsci\t"."bhci\t"."Method\t"."Wos number\t"."Doc type\t"."Cited\t"."Auth.#\t"."p.Year\t"."ea.Year\t"."Year\t"."Month\t"."Journal\t"."Journ\t"."Book\t"."issn\t"."eissn\t"."isbn\t"."Title\t"."Doi\t"."Vol.\t"."Issue\t"."Page.S\t"."Page.E\t"."Artic.Nr\t"."Ref.style\t"."PMID\t"."Pub type\t"."Publisher\t"."Book doi\t"."wosL\t"."doiL\t"."PMIDL\t"."Authors\t"."gAuthors\t"."Book auth\t"."Book ed\t"."Abstr\t"."M.Abstr\t"."RID\t"."OID";
 if ($wos2Authors)
 	$returnValue=$returnValue."\t"."Addresses\t"."Correspondence\t";
 $returnValue=$returnValue."\n";
@@ -60,6 +60,7 @@ for ($i=0; $i < count ($csv); $i++)	{
 	$title= $csv[$i]['TI'];
 	$pYear=$csv[$i]['PY'];
 	$eaDate=$csv[$i]['EA'];
+	$month=$csv[$i]['PD'];	// to help users using abta or aves
 	if ($eaDate) 
 		$eaYear=substr ($eaDate,-4); // rightmost 4 digit is early access year
 	else $eaYear ="";
@@ -142,7 +143,7 @@ for ($i=0; $i < count ($csv); $i++)	{
 	if ($qeissn== null) $qeissn = "?";
 	if ($queryYear >= $quartileTolerance) { // current year's quartile is not exists, tolerate it 
 		$queryYear = $quartileSource ;
-		$method = "tahmin";
+		$method = $quartileSource;
 	}
 	else {
 	$method = "kesin";
@@ -197,7 +198,7 @@ if ($miniMod) {
 }
 else if ($printLine) {
 	$nofPublications++;
-	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$ISTP ."\t".$ISSHP."\t".$BSCI ."\t".$BHCI ."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$journal."\t".$journ."\t".$book."\t".$issn."\t".$eissn."\t".$isbn."\t".$title."\t".$doi."\t".$volume."\t".$issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$pubType."\t".$publisher."\t".$bookDoi."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$gAuthors."\t".$bookAuth."\t".$bookEd."\t".$abstr."\t".$mAbstract."\t".$RID."\t".$OID;
+	$returnValue=$returnValue.$quartile."\t".$SCIE."\t".$SSCI."\t".$AHCI."\t".$ESCI."\t".$ISTP ."\t".$ISSHP."\t".$BSCI ."\t".$BHCI ."\t".$method."\t".$wosNumber."\t".$docType."\t".$citation."\t".$authorCount."\t".$pYear."\t".$eaYear."\t".$Year."\t".$month."\t".$journal."\t".$journ."\t".$book."\t".$issn."\t".$eissn."\t".$isbn."\t".$title."\t".$doi."\t".$volume."\t".$issue."\t".$pageBegin."\t".$pageEnd."\t".$articleNr."\t".$refStyle."\t".$PMID."\t".$pubType."\t".$publisher."\t".$bookDoi."\t".$wosLink."\t".$doiLink."\t".$PMIDLink."\t".$authors."\t".$gAuthors."\t".$bookAuth."\t".$bookEd."\t".$abstr."\t".$mAbstract."\t".$RID."\t".$OID;
 if ($wos2Authors)
 	$returnValue=$returnValue."\t".$addresses."\t".$correspondence;
 $returnValue=$returnValue."\n";	
@@ -211,7 +212,7 @@ $returnValue=$returnValue."\n";
 <button id="readBtn" onclick="readFunction()">Read</button> 
 <button id="saveTxtBtn" onclick="saveTxtFunction()">Save as tab delimited file</button> 
 <button id="copyBtn" onclick="copyTxtFunction()">Copy to clipboard</button> <br/>
-<a href="Tab delimited file.png" target="_blank"> Show me how to export in Web of Science </a>
+<a href="Tab delimited file.png" target="_blank"> Show me how to export from Web of Science </a>
 &emsp;&emsp;&emsp;&emsp;&emsp;Calculated #of publications=<?php echo $nofPublications;?><br/>
 <!----------------------------------- for php ---------------------------------------->
 <form method="post" action=""> 
