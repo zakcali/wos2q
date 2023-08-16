@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- Bu yazılım Dr. Zafer Akçalı tarafından oluşturulmuştur -->
 <!-- Programmed by Zafer Akçalı, MD-->
-<!-- wos2q-converter V4.6 / 11 Aug 2023, fixes corrupted/misquoted 2 strings when saving, 2022 quartiles, added month-->
+<!-- wos2q-converter V4.7 / 16 Aug 2023, fixes corrupted/misquoted 2 strings when saving, 2022 quartiles, added month, added article types-->
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -184,7 +184,7 @@ if ( ($qissn==$qeissn) && $qissn == "?") {
 		}
 if ($displayIf=='displayAll')
 	$printLine=TRUE;
-else if ($displayIf=='q123Articles' && $docType == 'Article' && ($quartile == 'Q1' || $quartile == 'Q2' || $quartile == 'Q3'))
+else if ($displayIf=='q123Articles' && strpos ($docType,'Article') !== false && ($quartile == 'Q1' || $quartile == 'Q2' || $quartile == 'Q3'))
 		$printLine=TRUE;
 else if ($displayIf=='ssahciOnly' && ($SSCI == 'SSCI' || $AHCI =='AHCI'))
 		$printLine=TRUE;
